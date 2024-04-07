@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "304234634338",
+    "project_id": "loginauthetication-d4a53",
+    "storage_bucket": "loginauthetication-d4a53.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:304234634338:android:eeebd6ee730959fa66453b",
+        "android_client_info": {
+          "package_name": "com.beetroot.loginmb"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6kzTTRQ2nffl-dhar60H0qa7WF4oDUTo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
