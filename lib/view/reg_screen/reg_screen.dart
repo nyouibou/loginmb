@@ -1,6 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loginmb/view/login_screen/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -17,9 +24,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController phone = TextEditingController();
   final formkey = GlobalKey<FormState>();
 
-  List<String> dropdownItems = ['', 'Admin', 'User'];
-
-  String selectedItem = '';
+  List<String> roles = ['', 'Admin', 'User'];
+  CollectionReference collectionReference =
+      FirebaseFirestore.instance.collection("users");
+  XFile? pickedImage;
+  var url = "";
+  String selectedRole = '';
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +64,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(
                   height: 20,
                 ),
-                CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://i.pinimg.com/564x/d9/6f/f5/d96ff52e57bb89951986bb788a12a2c4.jpg"),
-                  radius: 45,
+                InkWell(
+                  onTap: () async {
+                    pickedImage = await ImagePicker()
+                        .pickImage(source: ImageSource.gallery);
+
+                    if (pickedImage != null) {
+                      final uniquename = DateTime.timestamp()
+                          .microsecondsSinceEpoch
+                          .toString();
+                      final storageRef = FirebaseStorage.instance.ref();
+                      final imageRef = storageRef.child("users");
+                      final uploadRef = imageRef.child("$uniquename");
+                      await uploadRef.putFile(File(pickedImage!.path));
+                      url = await uploadRef.getDownloadURL();
+                      setState(() {});
+                      if (url != null) {
+                        log("upload successfully");
+                      } else {
+                        log("couldnt upload");
+                      }
+                    }
+                  },
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundImage: url != null ? NetworkImage(url) : null,
+                  ),
                 ),
                 SizedBox(
                   height: 20,
@@ -139,37 +171,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(
                   height: 20,
                 ),
-                DropdownButton<String>(
-                  value: selectedItem,
+                DropdownButtonFormField<String>(
+                  value: selectedRole,
                   onChanged: (newValue) {
                     setState(() {
-                      selectedItem = newValue!;
+                      selectedRole = newValue!;
                     });
                   },
-                  items: dropdownItems.map((String item) {
+                  items: roles.map((String role) {
                     return DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(item),
+                      value: role,
+                      child: Text(role),
                     );
                   }).toList(),
+                  decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        Icons.person,
+                        color: Colors.blue,
+                      ),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(10))),
                 ),
                 SizedBox(
                   height: 20,
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      if (email.text.isNotEmpty && passwrd.text.isNotEmpty) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          backgroundColor: Colors.red,
-                          content: Text("Username and password are required"),
-                        ));
+                      try {
+                        if (formkey.currentState!.validate()) {
+                          final cred = await FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                            email: email.text,
+                            password: passwrd.text,
+                          );
+                          collectionReference.add({
+                            "username": username.text,
+                            "ph": phone.text,
+                            "image": url,
+                            "role": selectedRole
+                          });
+                          if (cred.user?.uid != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginScreen(),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    "Failed to create Account, try again.."),
+                              ),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        print("Error: $e");
                       }
                     },
                     child: Text("Register")),

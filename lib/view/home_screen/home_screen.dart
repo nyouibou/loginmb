@@ -15,39 +15,40 @@ class _HomeScreenState extends State<HomeScreen> {
   String? savedData = '';
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: c1,
-              decoration: InputDecoration(border: OutlineInputBorder()),
-            ),
-            SizedBox(
-              height: 100,
-            ),
-            ElevatedButton(
-                onPressed: () async {
-// shared prefs
-                  //  to save data to shared preferences
-                  setState(() {});
-                },
-                child: Text("save")),
-            SizedBox(height: 100),
-            //
-            // Text(c1.text),
-            Text(savedData.toString()),
-            SizedBox(height: 50),
-            ElevatedButton(
-                onPressed: () async {
-                  //  again created object for shared prefs bcoz it is in function above
-                  // to get data
-                  // preferences.get("text");
-                  setState(() {});
-                },
-                child: Text("get"))
-          ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.logout))],
+        ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 100,
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    // shared prefs
+                    //  to save data to shared preferences
+                    setState(() {});
+                  },
+                  child: Text("save")),
+              SizedBox(height: 100),
+              //
+              // Text(c1.text),
+              Text(savedData.toString()),
+              SizedBox(height: 50),
+              ElevatedButton(
+                  onPressed: () async {
+                    //  again created object for shared prefs bcoz it is in function above
+                    // to get data
+                    // preferences.get("text");
+                    setState(() {});
+                  },
+                  child: Text("get"))
+            ],
+          ),
         ),
       ),
     );
