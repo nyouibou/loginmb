@@ -78,6 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 TextFormField(
                   controller: c2,
+                  obscureText: true,
                   decoration: InputDecoration(
                       prefixIcon: Icon(
                         Icons.lock,

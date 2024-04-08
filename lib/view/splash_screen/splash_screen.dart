@@ -32,9 +32,13 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text("Loading..."),
             SizedBox(
               height: 15,
             ),
+            CircularProgressIndicator(
+              backgroundColor: Colors.blue,
+            )
           ],
         ),
       ),
